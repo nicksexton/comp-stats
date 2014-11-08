@@ -7,13 +7,14 @@ end
 
 
 # Initialise the Metropolis sampler
-T = 1000; # max iterations
+T = 2000; # max iterations
 burnin = 500; # samples to exclude
+# burnin = 1; # samples to exclude
 sigma = 1.5 # std dev of normal proposal density
 thetamin  = -30; thetamax = 30; # define a range for starting values
-theta = zeros(4, T); # init storage space for our samples
+theta = zeros(T, 4); # init storage space for our samples
 # seed=1; rand('state', seed); randn('state',seed); # set the random seed
-theta(1,:) = unifrnd (thetamin, thetamax);
+theta(1,:) = unifrnd (thetamin, thetamax, 1,4);
 
 
 
@@ -24,12 +25,16 @@ while t < T # iterate until we have T samples
   # propose a new value for theta using a normal proposal density
   theta_star = normrnd (theta(t-1,:), sigma);
   # calculate the acceptance ratio
-  alpha = min ([ 1 (cauchy( theta_star(1,:)) / cauchy (theta(t-1,:) ))]);
+  alpha = zeros(1,4);
+  for i = 1:4
+    alpha(1,i) = min ([ 1 (cauchy( theta_star(1,i)) / cauchy (theta(t-1,i) ))]);
+  end
   # draw a uniform deviate from [0. 1]
-  u = rand;
+
   # do we accept this proposal?
   for (i = 1:columns(theta))
-    if u < alpha
+  u = rand;
+    if u < alpha(i)
       theta(t,i) = theta_star(1,i); # if so, proposal becomes a new state
     else
       theta(t,i) = theta(t-1,i); # if not, copy old state
@@ -42,7 +47,10 @@ figure (1); clf;
 subplot (3,1,1);
 nbins = 200;
 thetabins = linspace (thetamin, thetamax, nbins);
-counts = hist (theta(burnin:T), thetabins);
+counts = hist (theta(burnin:T,1), thetabins) +...
+    hist (theta(burnin:T,2), thetabins) +...
+    hist (theta(burnin:T,3), thetabins) +...
+    hist (theta(burnin:T,4), thetabins);
 bar (thetabins, counts/sum(counts), 'k');
 xlim ([thetamin thetamax]);
 xlabel ('\theta'); ylabel ('p(\theta)');
@@ -53,11 +61,27 @@ hold on;
 plot (thetabins, y/sum(y), 'r--', 'LineWidth', 3);
 set (gca, 'YTick', []);
 
+
 # display history of our samples
 subplot (3,1,2:3);
-stairs (theta, 1:T, 'k-');
+
+  stairs (theta(:,1), 1:T, 'k-r');
+  hold on;
+
+  stairs (theta(:,2), 1:T, 'k-g');
+  hold on;
+
+  stairs (theta(:,3), 1:T, 'k-b');
+  hold on;
+
+  stairs (theta(:,4), 1:T, 'k-m');
+  hold on;
+
 ylabel ('t'); xlabel ('\theta');
 set (gca, 'YDir', 'reverse');
 xlim ([thetamin thetamax]);
+
+
+
 
 accepted(1) / sum(accepted)
