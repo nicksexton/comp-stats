@@ -7,12 +7,14 @@ end
 
 
 # Initialise the Metropolis sampler
-T = 1000; # max iterations
+T = 2000; # max iterations
+burnin = 500; # samples to exclude
 sigma = 1; # std dev of normal proposal density
 thetamin  = -30; thetamax = 30; # define a range for starting values
 theta = zeros(1, T); # init storage space for our samples
 seed=1; rand('state', seed); randn('state',seed); # set the random seed
 theta(1) = unifrnd (thetamin, thetamax);
+
 
 # start sampling
 t = 1;
@@ -37,7 +39,7 @@ figure (1); clf;
 subplot (3,1,1);
 nbins = 200;
 thetabins = linspace (thetamin, thetamax, nbins);
-counts = hist (theta, thetabins);
+counts = hist (theta(burnin:T), thetabins);
 bar (thetabins, counts/sum(counts), 'k');
 xlim ([thetamin thetamax]);
 xlabel ('\theta'); ylabel ('p(\theta)');

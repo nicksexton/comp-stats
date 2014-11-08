@@ -7,12 +7,15 @@ end
 
 
 # Initialise the Metropolis sampler
-T = 1000; # max iterations
-sigma = 1; # std dev of normal proposal density
+T = 5000; # max iterations
+burnin = 500; # samples to exclude
+sigma = 1.5 # std dev of normal proposal density
 thetamin  = -30; thetamax = 30; # define a range for starting values
 theta = zeros(1, T); # init storage space for our samples
-seed=1; rand('state', seed); randn('state',seed); # set the random seed
+# seed=1; rand('state', seed); randn('state',seed); # set the random seed
 theta(1) = unifrnd (thetamin, thetamax);
+accepted = [0 0]; # accept : reject
+
 
 # start sampling
 t = 1;
@@ -27,8 +30,10 @@ while t < T # iterate until we have T samples
   # do we accept this proposal?
   if u < alpha
      theta(t) = theta_star; # if so, proposal becomes a new state
+     accepted(1) ++;
   else
     theta(t) = theta(t-1); # if not, copy old state
+    accepted(2) ++;
   end
 end
 
@@ -37,7 +42,7 @@ figure (1); clf;
 subplot (3,1,1);
 nbins = 200;
 thetabins = linspace (thetamin, thetamax, nbins);
-counts = hist (theta, thetabins);
+counts = hist (theta(burnin:T), thetabins);
 bar (thetabins, counts/sum(counts), 'k');
 xlim ([thetamin thetamax]);
 xlabel ('\theta'); ylabel ('p(\theta)');
@@ -55,3 +60,4 @@ ylabel ('t'); xlabel ('\theta');
 set (gca, 'YDir', 'reverse');
 xlim ([thetamin thetamax]);
 
+accepted(1) / sum(accepted)
