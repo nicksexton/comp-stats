@@ -15,7 +15,7 @@ end
 
 
 ## Initialise the Metropolis sampler
-T = 5000;
+T = 10000;
 thetamin = [ 0 0 ]
 thetamax = [ 8 8 ]
 seed=1; rand ('state', seed); randn ('state', seed); # set random seed
@@ -48,7 +48,7 @@ subplot (1,2,1);
 nbins = 10;
 thetabins1 = linspace (thetamin(1), thetamax(1), nbins);
 thetabins2 = linspace (thetamin(2), thetamax(2), nbins);
-hist3(theta, 'Edges', {thetabins1 thetabins2});
+hist3(transpose(theta), 'Edges', {thetabins1 thetabins2});
 xlabel ('\theta_1'); ylabel ('\theta_2'); zlabel ('counts')
 az = 61, e1 = 30;
 view (az, e1);
@@ -58,7 +58,7 @@ subplot (1,2,2);
 nbins = 20;
 thetabins1 = linspace (thetamin(1), thetamax(1), nbins);
 thetabins2 = linspace (thetamin(2), thetamax(2), nbins);
-[theta1grid, theta2grid] = meshgrid (thetabins(1), thetabins(2));
+[theta1grid, theta2grid] = meshgrid (thetabins1, thetabins2);
 ygrid = bivexp (theta1grid, theta2grid);
 mesh (theta1grid, theta2grid, ygrid);
 xlabel ('\theta_1'); ylabel ('\theta_2'); zlabel ('f(\theta_1,\theta_2')
