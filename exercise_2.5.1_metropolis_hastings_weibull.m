@@ -16,11 +16,11 @@ end
 
 
 # Initialise the Metropolis sampler
-T = 12000; # max iterations
+T = 12000;     # max iterations
 burnin = 500; # samples to exclude
-B = 1.9; # parameter for target (weibull) distribution
-A = 2; # parameter for target (weibull) distribution
-tau = 1.0; # precision parameter for proposal (gamma) dist
+B = 1.9;      # parameter for target (weibull) distribution
+A = 2;         # parameter for target (weibull) distribution
+tau = 1.0;           # precision parameter for proposal (gamma) dist
 thetamin  = 0; thetamax = 10; # define a range for starting values
 theta = zeros(1, T); # init storage space for our samples
 # seed=1; rand('state', seed); randn('state',seed); # set the random seed
@@ -33,12 +33,13 @@ while t < T # iterate until we have T samples
   t=t+1;
 
   # propose a new value for theta using proposal density
-  theta_star = gamrnd (tau, 1/tau);
+  theta_star = gamrnd (theta(t-1)*tau, 1/tau);
+
 
 
   # calculate the acceptance ratio
-  proposal_density_ratio = gampdf (theta(t-1), tau, 1/tau) / ...
-      gampdf (theta_star, tau, 1/tau);
+  proposal_density_ratio = gampdf (theta(t-1), theta_star*tau, 1/tau) / ...
+      gampdf (theta_star, theta(t-1)*tau, 1/tau);
 
   alpha = min ([ 1 (weibull_proportional( theta_star, A, B) / ...
 		    weibull_proportional(theta(t-1), A, B ))* ...
